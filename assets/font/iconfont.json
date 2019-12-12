@@ -1,0 +1,24 @@
+{
+  "id": "1505295",
+  "name": "SRM",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon",
+  "description": "Inventec SRM Project
+Mutual Evaluation System",
+  "glyphs": [
+    {
+      "icon_id": "1441332",
+      "name": "account-circle",
+      "font_class": "account-circle",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "1444468",
+      "name": "exit-to-app",
+      "font_class": "exit-to-app",
+      "unicode": "e721",
+      "unicode_decimal": 59169
+    }
+  ]
+}
