@@ -74,8 +74,8 @@ export default {
     getResourceList () {
       this.resourceList = [
         {
-          company_name: '中国移动上海分公司',
           resource_name: '钢管',
+          company_name: '中国移动上海分公司',
           resource_supplier: 'RMS开发运维部',
           resource_model: 'ISIIDSSSS-90-SDD',
           resource_stock: '10000',

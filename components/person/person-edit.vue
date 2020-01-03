@@ -6,13 +6,13 @@
       fullscreen>
       <el-form ref="form" :model="personInfo" :disabled="disabled" label-width="80px">
         <el-form-item label="单位名称"><el-input v-model="personInfo.company_name" /></el-form-item>
-        <el-form-item label="人名"><el-input v-model="personInfo.user_name" /></el-form-item>
+        <el-form-item label="人名"><el-input v-model="personInfo.person_name" /></el-form-item>
         <el-form-item label="部门"><el-input v-model="personInfo.department_name" /></el-form-item>
-        <el-form-item label="年龄"><el-input v-model="personInfo.user_age" /></el-form-item>
+        <el-form-item label="年龄"><el-input v-model="personInfo.person_age" /></el-form-item>
         <el-form-item label="职位"><el-input v-model="personInfo.position_name" /></el-form-item>
-        <el-form-item label="联系电话"><el-input v-model="personInfo.user_phone" /></el-form-item>
-        <el-form-item label="地址"><el-input v-model="personInfo.user_address" /></el-form-item>
-        <el-form-item label="特长"><el-input v-model="personInfo.user_speciality" /></el-form-item>
+        <el-form-item label="联系电话"><el-input v-model="personInfo.person_phone" /></el-form-item>
+        <el-form-item label="地址"><el-input v-model="personInfo.person_address" /></el-form-item>
+        <el-form-item label="特长"><el-input v-model="personInfo.person_speciality" /></el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">关 闭</el-button>

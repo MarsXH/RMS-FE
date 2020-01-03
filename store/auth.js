@@ -25,17 +25,22 @@ export const actions = {
       throw e
     }
   },
-  logout ({ commit }, params) {
-    commit('setUser', {})
-    deleteCookie('authorization')
-  },
-  async validate ({ commit, dispatch }, params) {
+  async logout ({ commit }) {
     try {
-      const { data } = await this.$axios.post(`/api/v1/validate`, params)
-      commit('setUser', data.user)
+      await this.$axios.post(`/api/v1/logout`)
+      commit('setUser', {})
+      deleteCookie('authorization')
     } catch (e) {
       console.log(e)
-      await dispatch('logout')
+      throw e
+    }
+  },
+  async validateToken ({ commit, dispatch }) {
+    try {
+      const { data } = await this.$axios.post(`/api/v1/validateToken`)
+      commit('setUser', data)
+    } catch (e) {
+      console.log(e)
     }
   }
 }

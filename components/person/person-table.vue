@@ -13,18 +13,18 @@
       border
       style="width: 100%">
       <el-table-column prop="company_name" label="单位名称" />
-      <el-table-column prop="user_name" label="人名" width="90" />
+      <el-table-column prop="person_name" label="人名" width="90" />
       <el-table-column prop="department_name" label="部门" />
-      <el-table-column prop="user_age" label="年龄" width="50" />
+      <el-table-column prop="person_age" label="年龄" width="50" />
       <el-table-column prop="position_name" label="职位" />
-      <el-table-column prop="user_phone" label="联系电话" width="120" />
-      <el-table-column prop="user_address" label="地址" />
-      <el-table-column prop="user_speciality" label="特长" />
+      <el-table-column prop="person_phone" label="联系电话" width="120" />
+      <el-table-column prop="person_address" label="地址" />
+      <el-table-column prop="person_speciality" label="特长" />
       <el-table-column label="操作" width="150">
         <template slot-scope="scope">
           <el-button @click="goDetail('read', scope.row)" type="primary" icon="el-icon-search" size="small" circle />
           <el-button v-if="isAdmin" @click="goDetail('edit', scope.row)" type="success" icon="el-icon-edit" size="small" circle />
-          <el-button v-if="isAdmin" @click="deletePerson(scope.row.user_uuid)" type="danger" icon="el-icon-delete" size="small" circle />
+          <el-button v-if="isAdmin" @click="deletePerson(scope.row.person_uuid)" type="danger" icon="el-icon-delete" size="small" circle />
         </template>
       </el-table-column>
     </el-table>
@@ -59,7 +59,8 @@ export default {
       total: 0,
       editDialogVisible: false,
       mode: 'add',
-      person: {}
+      person: {},
+      loading: false
     }
   },
   computed: {
@@ -71,37 +72,62 @@ export default {
     this.getPersonList()
   },
   methods: {
-    getPersonList () {
-      this.personList = [
-        {
-          company_name: '中国移动上海分公司',
-          user_name: '张兴华呀',
-          department_name: 'RMS开发运维部',
-          user_age: '28',
-          position_name: '前端开发工程师',
-          user_phone: '18846134496',
-          user_address: '黑龙江省哈尔滨市巴彦县道外区红旗大街999号黑龙江工程学院',
-          user_speciality: '踢足球'
+    async getPersonList () {
+      try {
+        if (!this.loading) {
+          this.loading = this.$loading()
         }
-      ]
+        const { data } = await this.$axios.get(`/api/v1/person`)
+        this.personList = data
+        this.personList = [
+          {
+            company_name: '中国移动上海分公司',
+            person_name: '张兴华呀',
+            department_name: 'RMS开发运维部',
+            person_age: '28',
+            position_name: '前端开发工程师',
+            person_phone: '18846134496',
+            person_address: '黑龙江省哈尔滨市巴彦县道外区红旗大街999号黑龙江工程学院',
+            person_speciality: '踢足球'
+          }
+        ]
+      } catch (e) {
+        console.log(e)
+        this.$message.error('获取人员列表失败！')
+      } finally {
+        if (this.loading) {
+          this.loading.close()
+          this.loading = false
+        }
+      }
     },
     goDetail (type, person = null) {
       this.mode = type
       this.person = person || {}
       this.editDialogVisible = true
     },
-    deletePerson (userUuid) {
+    deletePerson (personUuid) {
       this.$confirm('此操作将永久删除该人员, 是否继续?', '提示', {
         confirmButtonText: '删除',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
+      }).then(async () => {
+        try {
+          if (!this.loading) {
+            this.loading = this.$loading()
+          }
+          await this.$axios.delete(`/api/v1/deletePerson`, { personUuid })
+          this.$message.success('删除人员成功！')
+        } catch (e) {
+          console.log(e)
+          this.$message.error('删除人员失败！')
+        } finally {
+          if (this.loading) {
+            this.loading.close()
+            this.loading = false
+          }
+        }
       }).catch(() => {})
-      console.log(userUuid)
     }
   }
 }

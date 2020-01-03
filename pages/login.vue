@@ -20,19 +20,19 @@
 <script>
 export default {
   data () {
-    const validateId = (rule, value, callback) => {
-      const exp = /(iec|ies|IEC|IES)+([0-9a-zA-Z]){6}$/
-      if (value === '') { return callback(new Error('Please input the Inventec ID')) }
-      if (!exp.test(value)) { return callback(new Error('Wrong ID format.')) }
-      callback()
-    }
-    const validatePass = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('Password too short.'))
-      } else {
-        callback()
-      }
-    }
+    // const validateId = (rule, value, callback) => {
+    //   const exp = /(iec|ies|IEC|IES)+([0-9a-zA-Z]){6}$/
+    //   if (value === '') { return callback(new Error('Please input the Inventec ID')) }
+    //   if (!exp.test(value)) { return callback(new Error('Wrong ID format.')) }
+    //   callback()
+    // }
+    // const validatePass = (rule, value, callback) => {
+    //   if (value.length < 6) {
+    //     callback(new Error('Password too short.'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     return {
       alertTitle: '',
       status: '',
@@ -42,12 +42,12 @@ export default {
         disabled: false
       },
       inputRules: {
-        pass: [
-          { validator: validatePass, trigger: 'blur' }
-        ],
-        id: [
-          { validator: validateId, trigger: 'blur' }
-        ]
+        // pass: [
+        //   { validator: validatePass, trigger: 'blur' }
+        // ],
+        // id: [
+        //   { validator: validateId, trigger: 'blur' }
+        // ]
       }
     }
   },
@@ -93,7 +93,8 @@ export default {
       this[formName].disabled = false
       this.status = ''
     }
-  }
+  },
+  layout: 'auth'
 }
 </script>
 
