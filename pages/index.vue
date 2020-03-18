@@ -1,14 +1,14 @@
 <template>
   <div class="persion">
-    <person-table />
+    <people-table />
   </div>
 </template>
 
 <script>
-import PersonTable from '~/components/person/person-table'
+import PeopleTable from '~/components/people/people-table'
 export default {
   components: {
-    PersonTable
+    PeopleTable
   }
 }
 </script>

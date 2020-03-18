@@ -5,6 +5,7 @@
       :visible.sync="dialogVisible"
       fullscreen>
       <el-form ref="resourceForm" :model="resourceInfo" :disabled="disabled" label-width="90px">
+        <el-form-item v-if="mode !== 'add'" label="物资ID"><el-input v-model="resourceInfo.resource_id" :disabled="true" /></el-form-item>
         <el-form-item label="单位名称"><el-input v-model="resourceInfo.company_name" /></el-form-item>
         <el-form-item label="物资名称"><el-input v-model="resourceInfo.resource_name" /></el-form-item>
         <el-form-item label="当前供应商"><el-input v-model="resourceInfo.resource_supplier" /></el-form-item>
@@ -16,7 +17,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">关 闭</el-button>
-        <el-button v-if="mode !== 'read'" @click="saveResource" type="primary">保 存</el-button>
+        <el-button v-if="mode !== 'read'" @click="beforeSave()" type="primary">保 存</el-button>
       </span>
     </el-dialog>
   </div>
@@ -33,7 +34,8 @@ export default {
     return {
       title: '新增物资',
       resourceInfo: {},
-      disabled: false
+      disabled: false,
+      loading: false
     }
   },
   computed: {
@@ -59,8 +61,64 @@ export default {
     }
   },
   methods: {
-    saveResource () {
-      this.dialogVisible = false
+    beforeSave () {
+      if (this.mode === 'add') {
+        this.addResource()
+      } else if (this.mode === 'edit') {
+        this.updateResource()
+      }
+    },
+    async addResource () {
+      try {
+        if (!this.loading) {
+          this.loading = this.$loading()
+        }
+        const { data } = await this.$axios.post(`/api/v1/addResource`, this.resourceInfo)
+        if (data.code !== 0) {
+          this.$emit('updateResource')
+          this.dialogVisible = false
+          this.$message.success('新增资源成功！')
+        } else {
+          console.log(data.message)
+          this.$message.error('新增资源失败！' + data.message)
+        }
+      } catch (e) {
+        console.log(e)
+        this.$message.error('新增资源失败！' + e)
+      } finally {
+        if (this.loading) {
+          this.loading.close()
+          this.loading = false
+        }
+      }
+    },
+    async updateResource () {
+      try {
+        if (!this.loading) {
+          this.loading = this.$loading()
+        }
+        const params = {
+          resource_uuid: this.resourceInfo.resource_uuid,
+          resource_info: this.resourceInfo
+        }
+        const { data } = await this.$axios.put(`/api/v1/updateResource`, params)
+        if (data.code !== 0) {
+          this.$emit('updateResource')
+          this.dialogVisible = false
+          this.$message.success('更新资源成功！')
+        } else {
+          console.log(data.message)
+          this.$message.error('更新资源失败！' + data.message)
+        }
+      } catch (e) {
+        console.log(e)
+        this.$message.error('更新资源失败！' + e)
+      } finally {
+        if (this.loading) {
+          this.loading.close()
+          this.loading = false
+        }
+      }
     }
   }
 }

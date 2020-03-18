@@ -5,6 +5,7 @@
         <h1>CMCC-RMS</h1>
         <div />
         <div class="d-flex justify-end align-center">
+          <!-- <el-button type="danger" class="mr-2" size="mini" @click="$router.push('/user')">用户管理</el-button> -->
           <i class="iconfont iconaccount-circle mr-2" />
           {{ $store.state.auth.user.user_name }}
           <el-button @click="logout()" class="logout-btn header-nav-btn ml-2" circle>
@@ -16,6 +17,8 @@
         <el-tabs v-model="activeTab" @tab-click="changeTab" type="card">
           <el-tab-pane label="人员管理" name="persion" />
           <el-tab-pane label="物资管理" name="resource" />
+          <el-tab-pane label="个人中心" name="personal" />
+          <el-tab-pane v-if="$store.state.auth.user.user_role > 2" label="系统用户管理" name="user" />
         </el-tabs>
         <el-card :style="{ 'min-height': cardMinHeight + 'px' }" class="box-card">
           <nuxt />
@@ -37,6 +40,9 @@ export default {
   mounted () {
     this.getTableHeight()
     window.addEventListener('resize', () => { this.getTableHeight() })
+    if (this.$route.path.match(/personal/)) this.activeTab = 'personal'
+    else if (this.$route.path.match(/resource/)) this.activeTab = 'resource'
+    else if (this.$route.path.match(/user/)) this.activeTab = 'user'
   },
   destroyed () {
     window.removeEventListener('resize', () => { this.getTableHeight() })
@@ -50,8 +56,19 @@ export default {
       this.$router.push('/' + route)
     },
     async logout () {
-      await this.$axios.post(`/api/v1/rms/logout`)
-      window.location.href = '/login'
+      try {
+        const data = await this.$store.dispatch('auth/logout')
+        if (data.code !== 0) {
+          this.$message.error('退出成功！请重新登录。')
+        } else {
+          console.log(data.message)
+          this.$message.error('退出失败！' + data.message)
+        }
+      } catch (error) {
+        console.log(error, 'error')
+        this.status = 'error'
+        this.alertTitle = '服务器错误，请联系管理员。'
+      }
     }
   }
 }

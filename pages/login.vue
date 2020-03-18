@@ -2,15 +2,15 @@
   <div @keyup.enter="login()" class="container">
     <el-card class="panel">
       <el-form ref="LoginForm" :disabled="LoginForm.disabled" :model="LoginForm" :rules="inputRules" status-icon>
-        <el-form-item label="Account" prop="id">
+        <el-form-item label="账号" prop="id">
           <el-input v-model="LoginForm.id" />
         </el-form-item>
-        <el-form-item label="Password" prop="pass">
+        <el-form-item label="密码" prop="pass">
           <el-input v-model="LoginForm.pass" type="password" />
         </el-form-item>
         <el-form-item class="text-right">
-          <el-button @click="login()" type="primary">Go</el-button>
-          <el-button @click="resetForm('LoginForm')">Reset</el-button>
+          <el-button @click="login()" type="primary">登录</el-button>
+          <el-button @click="resetForm('LoginForm')">重置</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -60,29 +60,30 @@ export default {
         this.LoginForm.disabled = true
         if (valid) {
           this.status = 'processing'
-          this.alertTitle = 'Processing...'
-          const credential = { username: this.LoginForm.id, password: this.LoginForm.pass }
+          this.alertTitle = '拼命登录中...'
+          const credential = { user_name: this.LoginForm.id, user_password: this.LoginForm.pass }
           try {
-            await this.$store.dispatch('auth/login', credential)
-            this.alertTitle = `Nice, it's time to do something special.`
-            this.status = 'success'
-            this.LoginForm.disabled = false
-            this.$router.replace('/')
+            const data = await this.$store.dispatch('auth/login', credential)
+            if (data.code !== 0) {
+              this.alertTitle = `恭喜！登陆成功。`
+              this.status = 'success'
+              this.$router.replace('/')
+            } else {
+              this.status = 'error'
+              console.log(data.message)
+              this.$message.error('登录失败！' + data.message)
+              this.alertTitle = '登录失败！' + data.message
+            }
           } catch (error) {
             console.log(error, 'error')
             this.status = 'error'
-            if (error.response) {
-              this.alertTitle = error.response.status === 400
-                ? `Oops! Account not exists or incorrect password.`
-                : error.response.data.message || error.response.data
-            } else {
-              this.alertTitle = `Oops! Something wrong.`
-            }
+            this.alertTitle = '服务器错误，请联系管理员。'
+          } finally {
             this.LoginForm.disabled = false
           }
         } else {
           this.status = 'error'
-          this.alertTitle = 'You have to fill in all required items correctly before requesting.'
+          this.alertTitle = '用户名格式错误。'
           this.LoginForm.disabled = false
           return false
         }

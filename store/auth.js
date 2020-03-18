@@ -15,30 +15,32 @@ export const mutations = {
 }
 
 export const actions = {
-  async login ({ commit, dispatch }, params) {
-    try {
+  login ({ commit, dispatch }, params) {
+    return new Promise(async resolve => {
       const { data } = await this.$axios.post(`/api/v1/login`, params)
-      commit('setUser', data.user)
-    } catch (e) {
-      console.log(e)
-      await dispatch('logout')
-      throw e
-    }
+      if (data.code !== 0) {
+        commit('setUser', data.user)
+      }
+      resolve(data)
+    })
   },
-  async logout ({ commit }) {
-    try {
-      await this.$axios.post(`/api/v1/logout`)
+  logout ({ commit }) {
+    return new Promise(async resolve => {
+      const { data } = await this.$axios.post(`/api/v1/logout`)
       commit('setUser', {})
       deleteCookie('authorization')
-    } catch (e) {
-      console.log(e)
-      throw e
-    }
+      window.location.href = '/login'
+      resolve(data)
+    })
   },
   async validateToken ({ commit, dispatch }) {
     try {
       const { data } = await this.$axios.post(`/api/v1/validateToken`)
-      commit('setUser', data)
+      if (data.code === 0) {
+        console.log(data.message)
+      } else {
+        commit('setUser', data.user)
+      }
     } catch (e) {
       console.log(e)
     }

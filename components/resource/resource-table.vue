@@ -12,8 +12,9 @@
       :data="resourceList"
       border
       style="width: 100%">
-      <el-table-column prop="company_name" label="单位名称" />
+      <el-table-column prop="resource_id" label="物资ID" />
       <el-table-column prop="resource_name" label="物资名称" />
+      <el-table-column prop="company_name" label="单位名称" />
       <el-table-column prop="resource_supplier" label="当前供应商" />
       <el-table-column prop="resource_model" label="型号" />
       <el-table-column prop="resource_stock" label="存量" width="80" />
@@ -24,7 +25,7 @@
         <template slot-scope="scope">
           <el-button @click="goDetail('read', scope.row)" type="primary" icon="el-icon-search" size="small" circle />
           <el-button v-if="isAdmin" @click="goDetail('edit', scope.row)" type="success" icon="el-icon-edit" size="small" circle />
-          <el-button v-if="isAdmin" @click="deleteResource(scope.row.user_uuid)" type="danger" icon="el-icon-delete" size="small" circle />
+          <el-button v-if="isAdmin" @click="deleteResource(scope.row.resource_uuid)" type="danger" icon="el-icon-delete" size="small" circle />
         </template>
       </el-table-column>
     </el-table>
@@ -38,7 +39,7 @@
         background
         layout="total, sizes, prev, pager, next, jumper" />
     </div>
-    <resource-edit v-if="editDialogVisible" :editDialogVisible.sync="editDialogVisible" :mode="mode" :resource="resource" />
+    <resource-edit v-if="editDialogVisible" :editDialogVisible.sync="editDialogVisible" :mode="mode" :resource="resource" @updateResource="getResourceList()" />
   </div>
 </template>
 
@@ -59,49 +60,84 @@ export default {
       total: 0,
       editDialogVisible: false,
       mode: 'add',
-      resource: {}
+      resource: {},
+      loading: false
     }
   },
   computed: {
     isAdmin () {
-      return true
+      if (this.$store.state.auth.user) {
+        return this.$store.state.auth.user.user_role > 1
+      }
+      return false
     }
   },
   mounted () {
     this.getResourceList()
   },
   methods: {
-    getResourceList () {
-      this.resourceList = [
-        {
-          resource_name: '钢管',
-          company_name: '中国移动上海分公司',
-          resource_supplier: 'RMS开发运维部',
-          resource_model: 'ISIIDSSSS-90-SDD',
-          resource_stock: '10000',
-          resource_ullage: '10000',
-          resource_addressee: '张兴华1号',
-          resource_addresser: '张兴华2号'
+    async getResourceList () {
+      try {
+        if (!this.loading) {
+          this.loading = this.$loading()
         }
-      ]
+        const { data } = await this.$axios.get(`/api/v1/getResource`)
+        this.resourceList = data.resource_list
+        // this.resourceList = [
+        //   {
+        //     resource_name: '钢管',
+        //     company_name: '中国移动上海分公司',
+        //     resource_supplier: 'RMS开发运维部',
+        //     resource_model: 'ISIIDSSSS-90-SDD',
+        //     resource_stock: '10000',
+        //     resource_ullage: '10000',
+        //     resource_addressee: '张兴华1号',
+        //     resource_addresser: '张兴华2号'
+        //   }
+        // ]
+      } catch (e) {
+        console.log(e)
+        this.$message.error('获取资源列表失败！' + e)
+      } finally {
+        if (this.loading) {
+          this.loading.close()
+          this.loading = false
+        }
+      }
     },
     goDetail (type, resource = null) {
       this.mode = type
       this.resource = resource || {}
       this.editDialogVisible = true
     },
-    deleteResource (userUuid) {
+    deleteResource (resourceUuid) {
       this.$confirm('此操作将永久删除该物资, 是否继续?', '提示', {
         confirmButtonText: '删除',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
+      }).then(async () => {
+        try {
+          if (!this.loading) {
+            this.loading = this.$loading()
+          }
+          const { data } = await this.$axios.delete(`/api/v1/deleteResource?resource_uuid=${resourceUuid}`)
+          if (data.code !== 0) {
+            this.getResourceList()
+            this.$message.success('删除资源成功！')
+          } else {
+            console.log(data.message)
+            this.$message.error('删除资源失败！' + data.message)
+          }
+        } catch (e) {
+          console.log(e)
+          this.$message.error('删除资源失败！' + e)
+        } finally {
+          if (this.loading) {
+            this.loading.close()
+            this.loading = false
+          }
+        }
       }).catch(() => {})
-      console.log(userUuid)
     }
   }
 }
