@@ -12,15 +12,15 @@
       :data="peopleList"
       border
       style="width: 100%">
-      <el-table-column prop="people_id" label="人员ID" />
+      <el-table-column prop="people_id" label="人员ID" width="70" />
       <el-table-column prop="people_name" label="人名" width="90" />
-      <el-table-column prop="company_name" label="单位名称" />
-      <el-table-column prop="department_name" label="部门" />
+      <el-table-column prop="company_name" label="单位名称" width="150" />
+      <el-table-column prop="department_name" label="部门" width="150" />
       <el-table-column prop="people_age" label="年龄" width="50" />
-      <el-table-column prop="position_name" label="职位" />
+      <el-table-column prop="position_name" label="职位" width="130" />
       <el-table-column prop="people_phone" label="联系电话" width="120" />
       <el-table-column prop="people_address" label="地址" />
-      <el-table-column prop="people_speciality" label="特长" />
+      <el-table-column prop="people_speciality" label="特长" width="120" />
       <el-table-column label="操作" width="150">
         <template slot-scope="scope">
           <el-button @click="goDetail('read', scope.row)" type="primary" icon="el-icon-search" size="small" circle />
@@ -31,8 +31,9 @@
     </el-table>
     <div class="d-flex justify-end mt-2">
       <el-pagination
+        :current-page.sync="page"
         :total="total"
-        :page-size="size"
+        :page-size.sync="size"
         :page-sizes="[10, 20, 50, 100]"
         @size-change="getPeopleList()"
         @current-change="getPeopleList()"
@@ -56,7 +57,7 @@ export default {
       peopleList: [],
       string: '',
       page: 1,
-      size: 10,
+      size: 1,
       total: 0,
       editDialogVisible: false,
       mode: 'add',
@@ -81,11 +82,18 @@ export default {
         if (!this.loading) {
           this.loading = this.$loading()
         }
-        const { data } = await this.$axios.get(`/api/v1/getPeople`)
+        const params = {
+          string: this.string,
+          page: this.page,
+          size: this.size
+        }
+        const { data } = await this.$axios.get(`/api/v1/getPeople`, { params })
         if (data.code !== 0) {
           this.peopleList = data.people_list
+          this.total = data.total
         } else {
           this.peopleList = []
+          this.total = 0
           console.log(data.message)
           this.$message.error('获取人员列表失败！' + data.message)
         }

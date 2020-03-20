@@ -5,7 +5,7 @@
         <el-form ref="baseForm" :model="baseInfo" label-width="90px">
           <el-form-item label="用户ID"><el-input v-model="baseInfo.user_id" :disabled="true" /></el-form-item>
           <el-form-item label="用户名称"><el-input v-model="baseInfo.user_name" /></el-form-item>
-          <el-form-item label="创建时间"><el-input v-model="baseInfo.user_created" :disabled="true" /></el-form-item>
+          <el-form-item label="创建时间"><el-input :value="FormatDate(baseInfo.user_created)" :disabled="true" /></el-form-item>
         </el-form>
         <el-button @click="changeUsername()" type="primary">保 存</el-button>
       </el-tab-pane>
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { DeepClone } from '~/utils/utils'
+import { DeepClone, FormatDate } from '~/utils/utils'
 
 export default {
   data () {
@@ -47,6 +47,7 @@ export default {
     this.baseInfo = DeepClone(this.userInfo)
   },
   methods: {
+    FormatDate,
     changeUsername () {
       this.$confirm('确认要修改用户名 ? 修改后请重新登录。', '提示', {
         confirmButtonText: '修改',

@@ -12,13 +12,13 @@
       :data="resourceList"
       border
       style="width: 100%">
-      <el-table-column prop="resource_id" label="物资ID" />
+      <el-table-column prop="resource_id" label="物资ID" width="70" />
       <el-table-column prop="resource_name" label="物资名称" />
       <el-table-column prop="company_name" label="单位名称" />
       <el-table-column prop="resource_supplier" label="当前供应商" />
-      <el-table-column prop="resource_model" label="型号" />
-      <el-table-column prop="resource_stock" label="存量" width="80" />
-      <el-table-column prop="resource_ullage" label="欠缺量" width="80" />
+      <el-table-column prop="resource_model" label="型号" width="150" />
+      <el-table-column prop="resource_stock" label="存量" width="90" />
+      <el-table-column prop="resource_ullage" label="欠缺量" width="90" />
       <el-table-column prop="resource_addressee" label="收料人" width="90" />
       <el-table-column prop="resource_addresser" label="发料人" width="90" />
       <el-table-column label="操作" width="150">
@@ -31,8 +31,9 @@
     </el-table>
     <div class="d-flex justify-end mt-2">
       <el-pagination
+        :current-page.sync="page"
         :total="total"
-        :page-size="size"
+        :page-size.sync="size"
         :page-sizes="[10, 20, 50, 100]"
         @size-change="getResourceList()"
         @current-change="getResourceList()"
@@ -81,8 +82,21 @@ export default {
         if (!this.loading) {
           this.loading = this.$loading()
         }
-        const { data } = await this.$axios.get(`/api/v1/getResource`)
-        this.resourceList = data.resource_list
+        const params = {
+          string: this.string,
+          page: this.page,
+          size: this.size
+        }
+        const { data } = await this.$axios.get(`/api/v1/getResource`, { params })
+        if (data.code !== 0) {
+          this.resourceList = data.resource_list
+          this.total = data.total
+        } else {
+          this.resourceList = []
+          this.total = 0
+          console.log(data.message)
+          this.$message.error('获取资源列表失败！' + data.message)
+        }
         // this.resourceList = [
         //   {
         //     resource_name: '钢管',

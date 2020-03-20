@@ -15,8 +15,8 @@
             <el-option :value="3" label="超级管理员" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="mode !== 'add'" label="创建时间"><el-input v-model="userInfo.user_created" :disabled="true" /></el-form-item>
-        <el-form-item v-if="mode !== 'add'" label="更新时间"><el-input v-model="userInfo.user_updated" :disabled="true" /></el-form-item>
+        <el-form-item v-if="mode !== 'add'" label="创建时间"><el-input :value="FormatDate(userInfo.user_created)" :disabled="true" /></el-form-item>
+        <el-form-item v-if="mode !== 'add'" label="更新时间"><el-input :value="FormatDate(userInfo.user_updated)" :disabled="true" /></el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">关 闭</el-button>
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { FormatDate } from '~/utils/utils'
 export default {
   props: {
     editDialogVisible: { type: Boolean, default: false },
@@ -64,6 +65,7 @@ export default {
     }
   },
   methods: {
+    FormatDate,
     beforeSave () {
       if (this.mode === 'add') {
         this.addUser()

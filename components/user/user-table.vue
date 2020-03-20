@@ -12,11 +12,29 @@
       :data="userList"
       border
       style="width: 100%">
-      <el-table-column prop="user_id" label="用户ID" />
-      <el-table-column prop="user_name" label="用户名称" />
-      <el-table-column prop="user_created" label="创建时间" />
-      <el-table-column prop="user_updated" label="更新时间" />
-      <el-table-column prop="user_role" label="用户权限" />
+      <el-table-column prop="user_id" label="用户ID" width="80" />
+      <el-table-column prop="user_name" label="用户名称" min-width="150" />
+      <el-table-column prop="user_created" label="创建时间" min-width="170">
+        <template slot-scope="scope">
+          <div>
+            {{ FormatDate(scope.row.user_created) }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="user_updated" label="更新时间" min-width="170">
+        <template slot-scope="scope">
+          <div>
+            {{ FormatDate(scope.row.user_updated) }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="user_role" label="用户权限">
+        <template slot-scope="scope">
+          <div>
+            {{ scope.row.user_role | formatRole }}
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="250">
         <template slot-scope="scope">
           <el-button @click="goDetail('read', scope.row)" type="primary" icon="el-icon-search" size="small" circle />
@@ -28,8 +46,9 @@
     </el-table>
     <div class="d-flex justify-end mt-2">
       <el-pagination
+        :current-page.sync="page"
         :total="total"
-        :page-size="size"
+        :page-size.sync="size"
         :page-sizes="[10, 20, 50, 100]"
         @size-change="getUserList()"
         @current-change="getUserList()"
@@ -41,12 +60,20 @@
 </template>
 
 <script>
+import { FormatDate } from '~/utils/utils'
 import BaseSearchInput from '~/components/common/base-search-input'
 import UserEdit from '~/components/user/user-edit'
 export default {
   components: {
     BaseSearchInput,
     UserEdit
+  },
+  filters: {
+    formatRole (role) {
+      // 0: 账户锁定(无权限) 1: 普通用户 2: admin 3: superadmin
+      const roleMap = ['账户锁定', '普通用户', '管理员', '超级管理员']
+      return roleMap[role]
+    }
   },
   data () {
     return {
@@ -73,6 +100,7 @@ export default {
     this.getUserList()
   },
   methods: {
+    FormatDate,
     async getUserList () {
       try {
         if (!this.loading) {
@@ -87,11 +115,18 @@ export default {
         //     user_role: '10000'
         //   }
         // ]
-        const { data } = await this.$axios.get(`/api/v1/getUser`)
+        const params = {
+          string: this.string,
+          page: this.page,
+          size: this.size
+        }
+        const { data } = await this.$axios.get(`/api/v1/getUser`, { params })
         if (data.code !== 0) {
           this.userList = data.user_list
+          this.total = data.total
         } else {
           this.userList = []
+          this.total = 0
           console.log(data.message)
           this.$message.error('获取用户列表失败！' + data.message)
         }
