@@ -15,8 +15,7 @@ RUN buildDeps=' \
 	&& apt-get install -y libhiredis-dev node-gyp\
         && apt-get install -y $buildDeps --no-install-recommends \
         && rm -rf /var/lib/apt/lists/* \
-	&& yarn install \
-        && yarn build
+	&& yarn install
 
 EXPOSE 8000
 CMD ["yarn", "start"]
