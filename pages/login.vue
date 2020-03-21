@@ -67,7 +67,7 @@ export default {
             if (data.code !== 0) {
               this.alertTitle = `恭喜！登陆成功。`
               this.status = 'success'
-              this.$router.replace('/')
+              this.$router.push('/')
             } else {
               this.status = 'error'
               console.log(data.message)
