@@ -42,8 +42,10 @@ export const actions = {
       } else {
         commit('setUser', data.user)
         console.log('validateToken state', state)
+        console.log('validateToken state', state.user)
       }
     } catch (e) {
+      console.log('validateToken catch', e)
       console.log(e)
     }
   }
