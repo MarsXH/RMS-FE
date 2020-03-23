@@ -108,7 +108,7 @@ export default {
           user_name: this.userInfo.user_name,
           user_role: this.userInfo.user_role
         }
-        const { data } = await this.$axios.put(`/api/v1/changeUserInfo`, params)
+        const { data } = await this.$axios.post(`/api/v1/changeUserInfo`, params)
         if (data.code !== 0) {
           this.$emit('updateUser')
           this.dialogVisible = false
