@@ -67,7 +67,10 @@ export default {
             if (data.code !== 0) {
               this.alertTitle = `恭喜！登陆成功。`
               this.status = 'success'
+              console.log(`恭喜！登陆成功。`)
+              console.log(this.$router)
               this.$router.push('/')
+              console.log(`恭喜！登陆成功222。`)
             } else {
               this.status = 'error'
               console.log(data.message)
