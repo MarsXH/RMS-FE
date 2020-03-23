@@ -14,7 +14,7 @@ export const DeepClone = obj => {
  * @param {*要格式化的时间} time
  */
 export const FormatDate = time => {
-  const date = new Date(time)
+  const date = new Date(time * 1000)
   const year = date.getFullYear()
   const month = date.getMonth() + 1
   const d = date.getDate()
