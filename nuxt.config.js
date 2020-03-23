@@ -5,6 +5,7 @@ console.log('Is current mode production?', isProd)
 const apiUrl = isProd
   ? 'http://rms-backend:8899' : 'http://localhost:8899'
   // : process.env.BAK_URL || 'http://10.99.104.251:3001'
+// const apiUrl = 'http://localhost:8899'
 
 const proxy = {
   '/api/v1': { target: apiUrl, pathRewrite: {'^/api/v1': ''} }
