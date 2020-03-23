@@ -36,16 +36,12 @@ export const actions = {
   async validateToken ({ commit, dispatch }) {
     try {
       const { data } = await this.$axios.post(`/api/v1/validateToken`)
-      console.log('validateToken Data', data)
       if (data.code === 0) {
         console.log(data.message)
       } else {
         commit('setUser', data.user)
-        console.log('validateToken state', state)
-        console.log('validateToken state', state.user)
       }
     } catch (e) {
-      console.log('validateToken catch', e)
       console.log(e)
     }
   }

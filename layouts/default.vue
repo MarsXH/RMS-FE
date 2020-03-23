@@ -38,7 +38,6 @@ export default {
     }
   },
   mounted () {
-    console.log('default Layout this.$route', this.$route)
     this.getTableHeight()
     window.addEventListener('resize', () => { this.getTableHeight() })
     if (this.$route.path.match(/personal/)) this.activeTab = 'personal'
