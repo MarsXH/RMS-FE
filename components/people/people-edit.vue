@@ -4,10 +4,10 @@
       :title="title"
       :visible.sync="dialogVisible"
       fullscreen>
-      <el-form ref="form" :model="peopleInfo" :disabled="disabled" label-width="80px">
+      <el-form ref="peopleForm" :model="peopleInfo" :rules="rules" :disabled="disabled" label-width="80px">
         <el-form-item v-if="mode !== 'add'" label="人员ID"><el-input v-model="peopleInfo.people_id" :disabled="true" /></el-form-item>
         <el-form-item label="单位名称"><el-input v-model="peopleInfo.company_name" /></el-form-item>
-        <el-form-item label="人名"><el-input v-model="peopleInfo.people_name" /></el-form-item>
+        <el-form-item prop="people_name" label="人名"><el-input v-model="peopleInfo.people_name" /></el-form-item>
         <el-form-item label="部门"><el-input v-model="peopleInfo.department_name" /></el-form-item>
         <el-form-item label="年龄"><el-input v-model="peopleInfo.people_age" /></el-form-item>
         <el-form-item label="职位"><el-input v-model="peopleInfo.position_name" /></el-form-item>
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { DeepClone } from '~/utils/utils'
 export default {
   props: {
     editDialogVisible: { type: Boolean, default: false },
@@ -35,7 +36,10 @@ export default {
       title: '新增人员',
       peopleInfo: {},
       disabled: false,
-      loading: false
+      loading: false,
+      rules: {
+        people_name: [{ required: true, message: '请输入人员名称', trigger: 'blur' }]
+      }
     }
   },
   computed: {
@@ -51,9 +55,10 @@ export default {
   mounted () {
     if (this.mode === 'add') {
       this.title = '新增人员'
+      this.peopleInfo = {}
     } else if (this.mode === 'edit') {
       this.title = '编辑人员'
-      this.peopleInfo = this.people
+      this.peopleInfo = DeepClone(this.people)
     } else if (this.mode === 'read') {
       this.title = '查看人员'
       this.peopleInfo = this.people
@@ -62,11 +67,17 @@ export default {
   },
   methods: {
     beforeSave () {
-      if (this.mode === 'add') {
-        this.addPeople()
-      } else if (this.mode === 'edit') {
-        this.updatePeople()
-      }
+      this.$refs.peopleForm.validate(valid => {
+        if (!valid) {
+          this.$message.error('请检查必填项！')
+          return false
+        }
+        if (this.mode === 'add') {
+          this.addPeople()
+        } else if (this.mode === 'edit') {
+          this.updatePeople()
+        }
+      })
     },
     async addPeople () {
       try {

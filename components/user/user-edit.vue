@@ -4,10 +4,10 @@
       :title="title"
       :visible.sync="dialogVisible"
       fullscreen>
-      <el-form ref="userForm" :model="userInfo" :disabled="disabled" label-width="90px">
+      <el-form ref="userForm" :model="userInfo" :rules="rules" :disabled="disabled" label-width="90px">
         <el-form-item v-if="mode !== 'add'" label="用户ID"><el-input v-model="userInfo.user_id" :disabled="true" /></el-form-item>
-        <el-form-item label="用户名称"><el-input v-model="userInfo.user_name" /></el-form-item>
-        <el-form-item label="用户权限">
+        <el-form-item prop="user_name" label="用户名称"><el-input v-model="userInfo.user_name" /></el-form-item>
+        <el-form-item prop="user_role" label="用户权限">
           <el-select v-model="userInfo.user_role">
             <el-option :value="0" label="冻结账户" />
             <el-option :value="1" label="普通用户" />
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { FormatDate } from '~/utils/utils'
+import { DeepClone, FormatDate } from '~/utils/utils'
 export default {
   props: {
     editDialogVisible: { type: Boolean, default: false },
@@ -38,8 +38,13 @@ export default {
     return {
       title: '新增用户',
       userInfo: {},
+      oldUserName: '',
       disabled: false,
-      loading: false
+      loading: false,
+      rules: {
+        user_name: [{ required: true, message: '请输入用户名称', trigger: 'blur' }],
+        user_role: [{ required: true, message: '请选择用户权限', trigger: 'change' }]
+      }
     }
   },
   computed: {
@@ -55,23 +60,31 @@ export default {
   mounted () {
     if (this.mode === 'add') {
       this.title = '新增用户'
+      this.userInfo = {}
     } else if (this.mode === 'edit') {
       this.title = '编辑用户'
-      this.userInfo = this.user
+      this.userInfo = DeepClone(this.user)
     } else if (this.mode === 'read') {
       this.title = '查看用户'
       this.userInfo = this.user
       this.disabled = true
     }
+    this.oldUserName = this.userInfo.user_name
   },
   methods: {
     FormatDate,
     beforeSave () {
-      if (this.mode === 'add') {
-        this.addUser()
-      } else if (this.mode === 'edit') {
-        this.updateUser()
-      }
+      this.$refs.userForm.validate(valid => {
+        if (!valid) {
+          this.$message.error('请检查必填项！')
+          return false
+        }
+        if (this.mode === 'add') {
+          this.addUser()
+        } else if (this.mode === 'edit') {
+          this.updateUser()
+        }
+      })
     },
     async addUser () {
       try {
@@ -103,7 +116,7 @@ export default {
           this.loading = this.$loading()
         }
         const params = {
-          is_change_username: true,
+          is_change_username: !(this.oldUserName === this.userInfo.user_name),
           user_uuid: this.userInfo.user_uuid,
           user_name: this.userInfo.user_name,
           user_role: this.userInfo.user_role

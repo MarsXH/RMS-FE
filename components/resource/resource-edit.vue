@@ -4,10 +4,10 @@
       :title="title"
       :visible.sync="dialogVisible"
       fullscreen>
-      <el-form ref="resourceForm" :model="resourceInfo" :disabled="disabled" label-width="90px">
+      <el-form ref="resourceForm" :model="resourceInfo" :rules="rules" :disabled="disabled" label-width="90px">
         <el-form-item v-if="mode !== 'add'" label="物资ID"><el-input v-model="resourceInfo.resource_id" :disabled="true" /></el-form-item>
         <el-form-item label="单位名称"><el-input v-model="resourceInfo.company_name" /></el-form-item>
-        <el-form-item label="物资名称"><el-input v-model="resourceInfo.resource_name" /></el-form-item>
+        <el-form-item prop="resource_name" label="物资名称"><el-input v-model="resourceInfo.resource_name" /></el-form-item>
         <el-form-item label="当前供应商"><el-input v-model="resourceInfo.resource_supplier" /></el-form-item>
         <el-form-item label="型号"><el-input v-model="resourceInfo.resource_model" /></el-form-item>
         <el-form-item label="存量"><el-input v-model="resourceInfo.resource_stock" /></el-form-item>
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { DeepClone } from '~/utils/utils'
 export default {
   props: {
     editDialogVisible: { type: Boolean, default: false },
@@ -35,7 +36,10 @@ export default {
       title: '新增物资',
       resourceInfo: {},
       disabled: false,
-      loading: false
+      loading: false,
+      rules: {
+        resource_name: [{ required: true, message: '请输入物资名称', trigger: 'blur' }]
+      }
     }
   },
   computed: {
@@ -51,9 +55,10 @@ export default {
   mounted () {
     if (this.mode === 'add') {
       this.title = '新增物资'
+      this.resourceInfo = {}
     } else if (this.mode === 'edit') {
       this.title = '编辑物资'
-      this.resourceInfo = this.resource
+      this.resourceInfo = DeepClone(this.resource)
     } else if (this.mode === 'read') {
       this.title = '查看物资'
       this.resourceInfo = this.resource
@@ -62,11 +67,17 @@ export default {
   },
   methods: {
     beforeSave () {
-      if (this.mode === 'add') {
-        this.addResource()
-      } else if (this.mode === 'edit') {
-        this.updateResource()
-      }
+      this.$refs.resourceForm.validate(valid => {
+        if (!valid) {
+          this.$message.error('请检查必填项！')
+          return false
+        }
+        if (this.mode === 'add') {
+          this.addResource()
+        } else if (this.mode === 'edit') {
+          this.updateResource()
+        }
+      })
     },
     async addResource () {
       try {

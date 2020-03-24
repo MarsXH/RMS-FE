@@ -57,7 +57,7 @@ export default {
       peopleList: [],
       string: '',
       page: 1,
-      size: 1,
+      size: 10,
       total: 0,
       editDialogVisible: false,
       mode: 'add',

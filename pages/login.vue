@@ -6,7 +6,7 @@
           <el-input v-model="LoginForm.id" />
         </el-form-item>
         <el-form-item label="密码" prop="pass">
-          <el-input v-model="LoginForm.pass" type="password" />
+          <el-input v-model="LoginForm.pass" show-password />
         </el-form-item>
         <el-form-item class="text-right">
           <el-button @click="login()" type="primary">登录</el-button>
@@ -42,12 +42,8 @@ export default {
         disabled: false
       },
       inputRules: {
-        // pass: [
-        //   { validator: validatePass, trigger: 'blur' }
-        // ],
-        // id: [
-        //   { validator: validateId, trigger: 'blur' }
-        // ]
+        pass: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
+        id: [{ required: true, message: '账号不能为空', trigger: 'blur' }]
       }
     }
   },
@@ -83,7 +79,7 @@ export default {
           }
         } else {
           this.status = 'error'
-          this.alertTitle = '用户名格式错误。'
+          this.alertTitle = '账号或密码错误'
           this.LoginForm.disabled = false
           return false
         }
