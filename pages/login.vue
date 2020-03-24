@@ -1,5 +1,9 @@
 <template>
   <div @keyup.enter="login()" class="container">
+    <div>
+      <img src="~/assets/img/logo.png" class="logo" alt="中铁北京局（天津）公司人力资源管理系统">
+      <p class="title">人力资源管理系统</p>
+    </div>
     <el-card class="panel">
       <el-form ref="LoginForm" :disabled="LoginForm.disabled" :model="LoginForm" :rules="inputRules" status-icon>
         <el-form-item label="账号" prop="id">
@@ -96,6 +100,16 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.title
+  line-height 40px
+  font-size 20px
+  font-weight 900
+  color #555555
+  text-align center
+  margin-bottom 10px
+.logo
+  height 60px
+  margin-bottom 10px
 .container
   width 100vw
   height 100vh

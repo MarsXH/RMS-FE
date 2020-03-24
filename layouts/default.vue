@@ -2,10 +2,9 @@
   <div class="app-default-layout">
     <el-container class="app-container-box">
       <el-header class="d-flex justify-space-between align-center app-header-nav">
-        <h1>CMCC-RMS</h1>
-        <div />
+        <img src="~/assets/img/logo.png" class="logo" alt="中铁北京局（天津）公司人力资源管理系统">
+        <p class="title">人力资源管理系统</p>
         <div class="d-flex justify-end align-center">
-          <!-- <el-button type="danger" class="mr-2" size="mini" @click="$router.push('/user')">用户管理</el-button> -->
           <i class="iconfont iconaccount-circle mr-2" />
           {{ $store.state.auth.user.user_name }}
           <el-button @click="logout()" class="logout-btn header-nav-btn ml-2" circle>
@@ -35,6 +34,11 @@ export default {
     return {
       activeTab: 'persion',
       cardMinHeight: null
+    }
+  },
+  watch: {
+    '$route' () {
+      this.activeTab = (!this.$route.name || this.$route.name === 'index') ? 'persion' : this.$route.name
     }
   },
   mounted () {
@@ -94,6 +98,17 @@ export default {
     background-color: #f5f5f5;
     transition: all .1s;
     box-shadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12);
+    .title {
+      line-height: 40px;
+      font-size: 20px;
+      font-weight: 900;
+      margin-right: 160px;
+      color: #555555;
+    }
+    .logo {
+      height: 40px;
+      vertical-align: middle;
+    }
   }
   .header-nav-btn {
     border: 0;
